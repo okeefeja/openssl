@@ -583,5 +583,28 @@
     <elf-symbol name='d2i_SSL_SESSION' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='d2i_SSL_SESSION_ex' version='OPENSSL_3.2.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
     <elf-symbol name='i2d_SSL_SESSION' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='OSSL_ECH_INFO_free' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='OSSL_ECH_INFO_print' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_raw_decrypt' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_server_enable_buffer' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_server_enable_dir' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_server_enable_file' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_server_flush_keys' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_server_get_key_status' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_set1_echconfig' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_set_callback' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_CTX_ech_set_outer_alpn_protos' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_get_info' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_get_retry_config' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_get_status' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_reduce' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_set1_echconfig' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_set_callback' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_set_grease_suite' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_set_grease_type' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_set_outer_server_name' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='SSL_ech_set_server_names' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='ossl_ech_find_echconfigs' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
+    <elf-symbol name='ossl_ech_make_echconfig' version='OPENSSL_3.0.0' is-default-version='yes' type='func-type' binding='global-binding' visibility='default-visibility' is-defined='yes'/>
   </elf-function-symbols>
 </abi-corpus>
