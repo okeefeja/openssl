@@ -1,0 +1,54 @@
+Format: 1.8
+Date: Tue, 10 Oct 2023 16:36:40 +0200
+Source: openssl
+Binary: libcrypto3-udeb libssl-dev libssl-doc libssl3 libssl3-dbgsym libssl3-udeb openssl openssl-dbgsym
+Architecture: amd64 all
+Version: 3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989
+Distribution: unstable
+Urgency: medium
+Maintainer: Debian OpenSSL Team <pkg-openssl-devel@alioth-lists.debian.net>
+Changed-By: Jochen Sprickerhof <jspricke@debian.org>
+Description:
+ libcrypto3-udeb - Secure Sockets Layer toolkit - libcrypto udeb (udeb)
+ libssl-dev - Secure Sockets Layer toolkit - development files
+ libssl-doc - Secure Sockets Layer toolkit - development documentation
+ libssl3    - Secure Sockets Layer toolkit - shared libraries
+ libssl3-udeb - ssl shared library - udeb (udeb)
+ openssl    - Secure Sockets Layer toolkit - cryptographic utility
+Changes:
+ openssl (3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989) UNRELEASED; urgency=medium
+ .
+   ** SNAPSHOT build @9f532ba7fd **
+ .
+   * Add DEfO patches
+   * Fix Debian patches and symbols
+Checksums-Sha1:
+ 716c58e3f84042996241b8ecdc21f1da93ae01e5 1633376 libcrypto3-udeb_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.udeb
+ a82cecdb8113033ff1c6ad370450bb76caa106c7 2758696 libssl-dev_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ 27f1ced2d410e2e704d6544abf01c622d4572654 2102556 libssl-doc_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_all.deb
+ 92bb657c228cabac7cd15c8e5ade5c680f81975c 5730408 libssl3-dbgsym_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ 10f97b3aef8bc5692acc3245b3849f1bd8cadd45 373468 libssl3-udeb_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.udeb
+ 916a605ef5f61791217b08754e74850386c80860 2290984 libssl3_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ d0e7ed8f70441aa57d56b393d72ccbb63d2444a6 726436 openssl-dbgsym_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ b4b23266008bb982f6b607357cb7ace24f5b9f74 8301 openssl_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.buildinfo
+ 402c6aa9df11e93080a51c2784e012dfd93953ce 1381524 openssl_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+Checksums-Sha256:
+ 82c59c6c5a3205441df7beadb238296fd9629348dd9491dc6ab01feb86675f27 1633376 libcrypto3-udeb_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.udeb
+ 09feaca0760375708c36ca096dff529bb03ca5acd18aa33948f5dc65b4c7d93f 2758696 libssl-dev_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ 80ab3241493b6ba0e8c5b6f6aed30a3b0b60acf5ed80a5d769cec591289e983a 2102556 libssl-doc_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_all.deb
+ 400ff4ebfddaf12dee6f90048ea9a03f69f3891c1c2a520a4dca7777f1f963dd 5730408 libssl3-dbgsym_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ 41e3400b31b6f14dae62b7539f0efe2d61430a77067283d843ff048e316bfd9d 373468 libssl3-udeb_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.udeb
+ a3d3f85f4f9fa00d4a9818e43452fe86f3469e3cad4905d4db7646bd2267e6ee 2290984 libssl3_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ 42dac232af1376ee1210dfb5527e2016fb4f5ebf36b57739d00779dfdcc7fe69 726436 openssl-dbgsym_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ 624ab74ada5c0bbf6fad96cd0166e4a6dce0fa5e4d1dc7b9e529c9d2d4c76fa6 8301 openssl_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.buildinfo
+ cd6ad0196e78a6e705553a7ba599425deb132bce932636729df55c405216b8fd 1381524 openssl_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+Files:
+ 032ad9dfa695132e5047b6179de33321 1633376 debian-installer optional libcrypto3-udeb_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.udeb
+ c76d90fffb4abf39fc53b759d2fd8293 2758696 libdevel optional libssl-dev_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ d6dcfc23c6446c918a68adb9ef6b5ad0 2102556 doc optional libssl-doc_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_all.deb
+ a5eb4a9f7e9f90e768db96268875ee18 5730408 debug optional libssl3-dbgsym_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ 9d36d68c27d8e28ba04343f5903883af 373468 debian-installer optional libssl3-udeb_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.udeb
+ 7160615b0c63c82c3872ed9c4e6d61ba 2290984 libs optional libssl3_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ e426ade965cc0c205376fb24d10547fe 726436 debug optional openssl-dbgsym_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
+ 31a955f751f2a121e5982340e77e124a 8301 utils optional openssl_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.buildinfo
+ 8455f679c2eb340168b0db1b7d08c614 1381524 utils optional openssl_3.2.0.alpha2.1447.gb62be0f49b-20240213.210645422875989_amd64.deb
