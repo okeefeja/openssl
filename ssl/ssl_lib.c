@@ -27,6 +27,9 @@
 #include "internal/refcount.h"
 #include "internal/ktls.h"
 #include "quic/quic_local.h"
+#ifndef OPENSSL_NO_SECH
+# include "sech_local.h"
+#endif//OPENSSL_NO_SECH
 
 static int ssl_undefined_function_3(SSL_CONNECTION *sc, unsigned char *r,
                                     unsigned char *s, size_t t, size_t *u)
@@ -970,9 +973,6 @@ SSL *ossl_ssl_connection_new_int(SSL_CTX *ctx, const SSL_METHOD *method)
     s->ext.ech.encoded_innerch = NULL;
     s->ext.ech.kepthrr = NULL;
 #endif
-#ifndef OPENSSL_NO_SECH
-    s->sech.symmetric_key = ctx->sech.symmetric_key;
-#endif
     return ssl;
  cerr:
     ERR_raise(ERR_LIB_SSL, ERR_R_CRYPTO_LIB);
@@ -1632,6 +1632,7 @@ void SSL_set0_wbio(SSL *s, BIO *wbio)
 
 void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
 {
+    fprintf(stderr, "SECH: s->ctx: %lu", s->ctx);
     /*
      * For historical reasons, this function has many different cases in
      * ownership handling.
@@ -4193,9 +4194,9 @@ SSL_CTX *SSL_CTX_new_ex(OSSL_LIB_CTX *libctx, const char *propq,
     ret->ext.alpn_outer_len = 0;
 #endif
 #ifndef OPENSSL_NO_SECH
-    // probably need to do OPENSSL_malloc here
-    ret->sech.symmetric_key = OPENSSL_malloc(1024);
-#endif 
+  ret->sech.symmetric_key = OPENSSL_malloc(SECH_SYMMETRIC_KEY_MAX_LENGTH);
+#endif//OPENSSL_NO_SECH
+
     return ret;
  err:
     SSL_CTX_free(ret);
@@ -4322,7 +4323,8 @@ void SSL_CTX_free(SSL_CTX *a)
 #endif
 #ifndef OPENSSL_NO_SECH
     OPENSSL_free(a->sech.symmetric_key);
-#endif
+#endif//OPENSSL_NO_SECH
+
 
     CRYPTO_THREAD_lock_free(a->lock);
     CRYPTO_FREE_REF(&a->references);
