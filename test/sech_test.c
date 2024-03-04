@@ -85,14 +85,17 @@ static int encrypt_symmetric_test(void) {
     int res = 0;
     // encrypt_symmetric(NULL,NULL,NULL);
 
-    // char plain[] = "hello wonderful world\0";
-    // const unsigned char key[] = {0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB};
-    // char * cipher = NULL;
-    // unsafe_encrypt_aes256cbc((char *)(&plain), (char *)(&key), cipher);
-
-    do_crypt(stderr);
-    res = 1;
-end:
+    char plain[] = "example.com\0";
+    int plain_len = 11;
+    unsigned char key[] = {0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB};
+    int key_len = 8;
+    int out_len = -1;
+    char* cipher_text = unsafe_encrypt_aes128gcm(plain, plain_len, key, key_len, &out_len);
+    fprintf(stderr, "SECH: cipher_text ptr: %p\n", cipher_text);
+    BIO_dump_fp(stderr, cipher_text, out_len); // TODO return length from unsafe_encrypt_aes256cbc
+    if(cipher_text != NULL && out_len != -1) {
+        res = 1;
+    }
     return res;
 }
 
