@@ -974,6 +974,7 @@ SSL *ossl_ssl_connection_new_int(SSL_CTX *ctx, const SSL_METHOD *method)
     s->ext.ech.kepthrr = NULL;
 #endif
 #ifndef OPENSSL_NO_SECH
+    s->sech.symmetric_key = OPENSSL_malloc(SECH_SYMMETRIC_KEY_MAX_LENGTH);
     s->sech.symmetric_key = ctx->sech.symmetric_key;
 #endif
     return ssl;
