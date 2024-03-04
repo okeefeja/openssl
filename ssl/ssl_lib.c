@@ -973,6 +973,9 @@ SSL *ossl_ssl_connection_new_int(SSL_CTX *ctx, const SSL_METHOD *method)
     s->ext.ech.encoded_innerch = NULL;
     s->ext.ech.kepthrr = NULL;
 #endif
+#ifndef OPENSSL_NO_SECH
+    s->sech.symmetric_key = ctx->sech.symmetric_key;
+#endif
     return ssl;
  cerr:
     ERR_raise(ERR_LIB_SSL, ERR_R_CRYPTO_LIB);
