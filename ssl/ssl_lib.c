@@ -1580,9 +1580,9 @@ void ossl_ssl_connection_free(SSL *ssl)
         s->s3.handshake_buffer = NULL;
     }
 #endif
-// #ifndef OPENSSL_NO_SECH
-//     OPENSSL_free(s->sech.symmetric_key);
-// #endif
+#ifndef OPENSSL_NO_SECH
+    OPENSSL_free(s->sech.symmetric_key);
+#endif
 }
 
 void SSL_set0_rbio(SSL *s, BIO *rbio)
