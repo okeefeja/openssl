@@ -973,6 +973,12 @@ SSL *ossl_ssl_connection_new_int(SSL_CTX *ctx, const SSL_METHOD *method)
     s->ext.ech.encoded_innerch = NULL;
     s->ext.ech.kepthrr = NULL;
 #endif
+#ifndef OPENSSL_NO_SECH
+    s->sech.symmetric_key = OPENSSL_malloc(SECH_SYMMETRIC_KEY_MAX_LENGTH);
+    if (s->sech.symmetric_key == NULL)
+            goto err;
+    memcpy(s->sech.symmetric_key, ctx->sech.symmetric_key, SECH_SYMMETRIC_KEY_MAX_LENGTH);
+#endif
     return ssl;
  cerr:
     ERR_raise(ERR_LIB_SSL, ERR_R_CRYPTO_LIB);
@@ -1576,9 +1582,9 @@ void ossl_ssl_connection_free(SSL *ssl)
         s->s3.handshake_buffer = NULL;
     }
 #endif
-// #ifndef OPENSSL_NO_SECH
-//     OPENSSL_free(s->sech.symmetric_key);
-// #endif
+#ifndef OPENSSL_NO_SECH
+    OPENSSL_free(s->sech.symmetric_key);
+#endif
 }
 
 void SSL_set0_rbio(SSL *s, BIO *rbio)
