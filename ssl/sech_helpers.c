@@ -14,144 +14,87 @@
 #ifndef OPENSSL_NO_ECH
 #define SECH_SYMMETRIC_KEY_MAX_LENGTH 1024
 // int sech_function_definition_to_find(void);
+#include <stdio.h>
+#include <openssl/crypto.h>
+#include <openssl/err.h>
+#include <openssl/bio.h>
+#include <openssl/core_names.h>
 #include <openssl/evp.h>
 #include <stdlib.h>
 #include <string.h>
 
-int encrypt_symmetric(char * plain, char * key_bytes, char * cipher) {
-    return 0;
-}
+OSSL_LIB_CTX *libctx = NULL;
+const char *propq = NULL;
 
-int unsafe_encrypt_aes256cbc(char * plain, unsigned char * somekey, char * cipher) {
-    unsigned char outbuf[1024];
-    int outlen, tmplen;
-    /*
-     * Bogus key and IV: we'd normally set these from
-     * another source.
-     */
-    unsigned char key[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-    unsigned char iv[] = {1,2,3,4,5,6,7,8};
-    char intext[] = "Some Crypto Text";
-    EVP_CIPHER_CTX *ctx;
-    FILE *out;
-
-    ctx = EVP_CIPHER_CTX_new();
-    if (!EVP_EncryptInit_ex2(ctx, EVP_idea_cbc(), key, iv, NULL)) {
-        /* Error */
-        fprintf(stderr, "SECH: error in EVP_EncryptInit_ex2\n");
-        EVP_CIPHER_CTX_free(ctx);
-        return 0;
-    }
-    return 1;
-}
-//     int res = 0;
-//     EVP_CIPHER_CTX * ctx = EVP_CIPHER_CTX_new();
-//     if(ctx == NULL) {
-//         fprintf(stderr, "SECH: cipher ctx is NULL\n");
-//     }
-//     EVP_CIPHER * aes256cbc = EVP_CIPHER_fetch(NULL, "AES-256-CBC", NULL);
-//     unsigned char outbuf[1024];
-//     int outlen, tmplen;
-//     unsigned char lkey[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-//     unsigned char iv[] = {1,2,3,4,5,6,7,8};
-//     fprintf(stderr,  "SECH: aes356cbc cb: %p\n", aes256cbc);
-//     if( !EVP_EncryptInit_ex2(
-//           ctx,
-//           EVP_idea_cbc(), // aes256cbc,
-//           lkey,
-//           iv,// const unsigned char * iv; initialization vector
-//           NULL
-//           ) ||
-//       1)   
-//     {
-//         fprintf(stderr, "SECH: encountered error in EVP_EncryptInit_ex2\n");
-//         goto end;
-//     }
-//     if( !EVP_EncryptUpdate(
-//           ctx,
-//           outbuf,
-//           &outlen,
-//           plain,
-//           strlen(plain)) ||
-//       1)   
-//     {
-//         fprintf(stderr, "SECH: encountered error in EVP_EncryptUpdate\n");
-//         goto end;
-//     }
-//     if( !EVP_EncryptFinal_ex(
-//           ctx, // EVP_CIPHER_CTX *ctx,
-//           outbuf + outlen,
-//           &tmplen) ||
-//       1)   
-//     {
-//         fprintf(stderr, "SECH: encountered error in EVP_EncryptFinal_ex\n");
-//         goto end;
-//     }
-//     outlen += tmplen;
-//     fprintf(stderr, "SECH: inlen: %lu\n", strlen(plain));
-//     fprintf(stderr, "SECH: outlen: %i\n", outlen);
-//     for(int i = 0; i < outlen; ++i) {
-//         fprintf(stderr, "%02X ",(unsigned char) outbuf[i]);
-//     } fprintf(stderr, "\n");
-// end:
-//     EVP_CIPHER_CTX_free(ctx);
-//     return res;
-// 
-// }
-
-int do_crypt(char *outfile)
+char * unsafe_encrypt_aes128gcm(
+    unsigned char * plain,
+    int plain_len,
+    unsigned char * somekey,
+    int key_len,
+    int * out_len)
 {
     unsigned char outbuf[1024];
     int outlen, tmplen;
+
     /*
      * Bogus key and IV: we'd normally set these from
      * another source.
      */
-    unsigned char key[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-    unsigned char iv[] = {1,2,3,4,5,6,7,8};
-    char intext[] = "Some Crypto Text";
-    EVP_CIPHER_CTX *ctx;
-    FILE *out;
+    unsigned char * iv = NULL; // TODO generate iv securely
+    EVP_CIPHER_CTX *ctx = NULL;
+    EVP_CIPHER * cipher = NULL;
+
+    BIO_dump_fp(stderr, plain, plain_len);
 
     ctx = EVP_CIPHER_CTX_new();
-    if (!EVP_EncryptInit_ex2(ctx, EVP_idea_cbc(), key, iv, NULL)) {
+    /* Fetch the cipher implementation */
+    if ((cipher = EVP_CIPHER_fetch(libctx, "AES-128-GCM", propq)) == NULL) {
+        fprintf(stderr, "SECH: unsafe error in EVP_CIPHER_fetch\n");
+        EVP_CIPHER_CTX_free(ctx);
+        return NULL;
+    }
+    if (!EVP_EncryptInit_ex2(ctx, cipher, somekey, iv, NULL)) {
         /* Error */
-        fprintf(stderr, "SECH: error in EVP_EncryptInit_ex2\n");
+        fprintf(stderr, "SECH: unsafe error in EVP_EncryptInit_ex2\n");
         EVP_CIPHER_CTX_free(ctx);
         return 0;
     }
-
-    if (!EVP_EncryptUpdate(ctx, outbuf, &outlen, intext, strlen(intext))) {
-        /* Error */
-        fprintf(stderr, "SECH: error in EVP_EncryptUpdate\n");
+    if( !EVP_EncryptUpdate(
+       ctx,
+       outbuf,
+       &outlen,
+       plain,
+       plain_len) )
+    {
+        fprintf(stderr, "SECH: encountered error in EVP_EncryptUpdate\n");
         EVP_CIPHER_CTX_free(ctx);
         return 0;
     }
-    /*
-     * Buffer passed to EVP_EncryptFinal() must be after data just
-     * encrypted to avoid overwriting it.
-     */
-    if (!EVP_EncryptFinal_ex(ctx, outbuf + outlen, &tmplen)) {
-        /* Error */
+    if( !EVP_EncryptFinal_ex(
+          ctx, // EVP_CIPHER_CTX *ctx,
+          outbuf + outlen,
+          &tmplen) )
+    {
+        fprintf(stderr, "SECH: encountered error in EVP_EncryptFinal_ex\n");
         EVP_CIPHER_CTX_free(ctx);
         return 0;
     }
     outlen += tmplen;
-    EVP_CIPHER_CTX_free(ctx);
-    /*
-     * Need binary mode for fopen because encrypted data is
-     * binary data. Also cannot use strlen() on it because
-     * it won't be NUL terminated and may contain embedded
-     * NULs.
-     */
-    out = fopen(outfile, "wb");
-    if (out == NULL) {
-        /* Error */
-        return 0;
+    fprintf(stderr, "SECH: outlen: %i\n", outlen);
+    fprintf(stderr, "SECH: outbuf ptr: %p\n", (void*)outbuf);
+    fprintf(stderr, "SECH: outbuf:\n");
+    BIO_dump_fp(stderr, outbuf, outlen);
+    char* ret = (char*)malloc(outlen + 1);
+    if (ret == NULL) {
+        fprintf(stderr, "SECH: failed to allocate memory\n");
+        EVP_CIPHER_CTX_free(ctx);
+        return NULL;
     }
-    fwrite(outbuf, 1, outlen, out);
-    fclose(out);
-    return 1;
+    memcpy(ret, outbuf, outlen);
+    fprintf(stderr, "SECH: ret ptr: %p\n", (void*)ret);
+    BIO_dump_fp(stderr, ret, outlen);
+    fprintf(stderr, "SECH: finished symmetric encryption\n");
+    *out_len = outlen;
+    return ret;
 }
-
 #endif

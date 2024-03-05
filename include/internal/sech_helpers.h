@@ -15,9 +15,11 @@
 #define OPENSSL_H_SECH_HELPERS
 #ifndef OPENSSL_NO_SECH
 #define SECH_SYMMETRIC_KEY_MAX_LENGTH 1024
-int sech_function_definition_to_find(void);
-int encrypt_symmetric(char * plain, char * key_bytes, char * cipher);
-int unsafe_encrypt_aes256cbc(char * plain, char * key, char * cipher);
-int do_crypt(char *outfile);
+char * unsafe_encrypt_aes128gcm(
+    unsigned char * plain,
+    int plain_len,
+    unsigned char * somekey,
+    int key_len,
+    int * out_len);
 #endif
 #endif

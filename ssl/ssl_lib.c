@@ -1638,7 +1638,6 @@ void SSL_set0_wbio(SSL *s, BIO *wbio)
 
 void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
 {
-    fprintf(stderr, "SECH: s->ctx: %lu", s->ctx);
     /*
      * For historical reasons, this function has many different cases in
      * ownership handling.
