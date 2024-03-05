@@ -10,7 +10,6 @@
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 #include <openssl/ech.h>
-#include "sech_local.h"
 #include "ssl_local.h"
 #include "ech_local.h"
 #include "statem/statem_local.h"
@@ -47,13 +46,14 @@ int SSL_CTX_sech_decode_sni(SSL_CTX *ctx)
 
 int SSL_CTX_sech_symmetric_key(SSL_CTX *ctx, char *key)
 {
+    BIO * trace_out = BIO_new_fp(stderr, NULL);
     fprintf(stderr, "SECH: key %s\n", key);
     OSSL_TRACE_BEGIN(TLS) {
-        BIO_printf(trc_out, "SECH: test trace 1");
+        BIO_printf(trace_out, "SECH: test trace 1");
     } OSSL_TRACE_END(TLS);
     if (key == NULL) {
         OSSL_TRACE_BEGIN(TLS) {
-            BIO_printf(trc_out, "SECH: ERROR: Supplied symmetric key is NULL\n");
+            BIO_printf(trace_out, "SECH: ERROR: Supplied symmetric key is NULL\n");
         } OSSL_TRACE_END(TLS);
         return 0;
     }

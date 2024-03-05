@@ -22,6 +22,7 @@
 #include <openssl/evp.h>
 #include <stdlib.h>
 #include <string.h>
+#include <openssl/trace.h>
 
 OSSL_LIB_CTX *libctx = NULL;
 const char *propq = NULL;
@@ -33,6 +34,17 @@ char * unsafe_encrypt_aes128gcm(
     int key_len,
     int * out_len)
 {
+    
+    if (OSSL_TRACE_ENABLED(TLS)) {
+        fprintf(stderr, "trace enabled\n");
+        OSSL_TRACE_BEGIN(TLS) {
+            BIO_printf(trc_out, "Debugging information\n");
+        } OSSL_TRACE_END(TLS);
+    }
+    BIO * trace_out = BIO_new_fp(stderr, NULL);
+    OSSL_TRACE_BEGIN(TLS) {
+        BIO_printf(trace_out, "SECH: test trace BIO_printf\n");
+    } OSSL_TRACE_END(TLS);
 #ifdef  SECH_DEBUG
     fprintf(stderr, "SECH: debug enabled\n");
 #endif//SECH_DEBUG

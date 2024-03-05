@@ -11,11 +11,48 @@
 #include <openssl/hpke.h>
 #include "../include/internal/sech_helpers.h"
 #include "testutil.h"
+#include <openssl/trace.h>
 #include "helpers/ssltestlib.h"
 
 #ifndef OPENSSL_NO_ECH
 
 # define OSSL_ECH_MAX_LINELEN 1000 /* for a sanity check */
+
+static size_t ech_trace_cb(const char *buf, size_t cnt,
+                           int category, int cmd, void *vdata)
+{
+     BIO *bio = vdata;
+     const char *label = NULL;
+     size_t brv = 0;
+
+     switch (cmd) {
+     case OSSL_TRACE_CTRL_BEGIN:
+         label = "ECH TRACE BEGIN";
+         break;
+     case OSSL_TRACE_CTRL_END:
+         label = "ECH TRACE END";
+         break;
+     }
+     if (label != NULL) {
+#  if defined(OPENSSL_THREADS) && !defined(OPENSSL_SYS_WINDOWS) \
+      && !defined(OPENSSL_SYS_MSDOS)
+         union {
+             pthread_t tid;
+             unsigned long ltid;
+         } tid;
+
+         tid.tid = pthread_self();
+         BIO_printf(bio, "%s TRACE[%s]:%lx\n", label,
+                    OSSL_trace_get_category_name(category), tid.ltid);
+#  else
+         BIO_printf(bio, "%s TRACE[%s]:0\n", label,
+                    OSSL_trace_get_category_name(category));
+#  endif
+     }
+     brv = (size_t)BIO_puts(bio, buf);
+     (void)BIO_flush(bio);
+     return brv;
+}
 
 /*
  * The command line argument one can provide is the location
@@ -137,8 +174,15 @@ const OPTIONS *test_get_options(void)
 
 #endif
 
+static BIO *bio_s_out = NULL;
 int setup_tests(void)
 {
+# ifndef OPENSSL_NO_SSL_TRACE
+      OSSL_trace_set_callback(
+          OSSL_TRACE_CATEGORY_TLS,
+          ech_trace_cb,
+          bio_s_out);
+#endif
 #ifndef OPENSSL_NO_ECH
     OPTION_CHOICE o;
     // int suite_combos;
