@@ -85,8 +85,8 @@ static int encrypt_symmetric_test(void) {
     int res = 0;
     // encrypt_symmetric(NULL,NULL,NULL);
 
-    char plain[] = "example.com\0";
-    int plain_len = 11;
+    unsigned char plain[] = "fooooooooooooooooooooooooooooooooooooooooooooooo.example.com";
+    int plain_len = sizeof(plain) - 1;//  / sizeof(unsigned char);
     unsigned char key[] = {0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB};
     int key_len = 8;
     int out_len = -1;

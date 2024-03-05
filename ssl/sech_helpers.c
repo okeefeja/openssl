@@ -33,6 +33,9 @@ char * unsafe_encrypt_aes128gcm(
     int key_len,
     int * out_len)
 {
+#ifdef  SECH_DEBUG
+    fprintf(stderr, "SECH: debug enabled\n");
+#endif//SECH_DEBUG
     unsigned char outbuf[1024];
     int outlen, tmplen;
 
@@ -40,11 +43,14 @@ char * unsafe_encrypt_aes128gcm(
      * Bogus key and IV: we'd normally set these from
      * another source.
      */
-    unsigned char * iv = NULL; // TODO generate iv securely
+    unsigned char * iv = NULL; // {0,0,0,0,0,0,0,0,0,0,0,0};// NULL; // TODO generate iv securely
     EVP_CIPHER_CTX *ctx = NULL;
     EVP_CIPHER * cipher = NULL;
 
+#ifdef  SECH_DEBUG
     BIO_dump_fp(stderr, plain, plain_len);
+    BIO_dump_fp(stderr, somekey, key_len);
+#endif//SECH_DEBUG
 
     ctx = EVP_CIPHER_CTX_new();
     /* Fetch the cipher implementation */
@@ -59,6 +65,7 @@ char * unsafe_encrypt_aes128gcm(
         EVP_CIPHER_CTX_free(ctx);
         return 0;
     }
+
     if( !EVP_EncryptUpdate(
        ctx,
        outbuf,
@@ -70,6 +77,16 @@ char * unsafe_encrypt_aes128gcm(
         EVP_CIPHER_CTX_free(ctx);
         return 0;
     }
+
+    int iv_length = EVP_CIPHER_CTX_get_iv_length(ctx);
+    fprintf(stderr, "SECH: iv length: %i\n", iv_length);
+    // const unsigned char *EVP_CIPHER_CTX_iv(const EVP_CIPHER_CTX *ctx);
+    unsigned char updated_iv[iv_length];
+    if(!EVP_CIPHER_CTX_get_updated_iv(ctx, updated_iv, iv_length)) {
+        fprintf(stderr, "SECH: failed to get updated_iv\n");
+    }
+    BIO_dump_fp(stderr, updated_iv, iv_length);
+
     if( !EVP_EncryptFinal_ex(
           ctx, // EVP_CIPHER_CTX *ctx,
           outbuf + outlen,
