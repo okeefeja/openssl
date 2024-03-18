@@ -27,6 +27,9 @@
 #include <openssl/core_names.h>
 #include <openssl/param_build.h>
 #include "internal/cryptlib.h"
+#ifndef OPENSSL_NO_SECH
+#include "internal/sech_helpers.h"
+#endif//OPENSSL_NO_SECH
 
 static MSG_PROCESS_RETURN tls_process_as_hello_retry_request(SSL_CONNECTION *s,
                                                              PACKET *pkt);
@@ -1513,7 +1516,27 @@ __owur CON_FUNC_RETURN tls_construct_client_hello(SSL_CONNECTION *s, WPACKET *pk
      * For TLS 1.3 we always set the ClientHello version to 1.2 and rely on the
      * supported_versions extension for the real supported versions.
      */
-#ifndef OPENSSL_NO_ECH
+#ifndef OPENSSL_NO_SECH
+    /* Get the length of the Client Hello Inner SNI */
+    int inner_sni_length = strlen(s->ext.hostname);
+    
+    /* Encrypt the Client Hello Inner SNI */
+    char * encrypted_sni = unsafe_encrypt_aes128gcm((unsigned char *)s->ext.hostname, inner_sni_length, (unsigned char *)s->sech.symmetric_key, SECH_SYMMETRIC_KEY_MAX_LENGTH, &inner_sni_length);
+
+    /* Replace last characters of Client Random with encrypted SNI */
+    if(inner_sni_length < SSL3_RANDOM_SIZE) {
+        for(int i = 0; i < SSL3_RANDOM_SIZE - (SSL3_RANDOM_SIZE - inner_sni_length); i++) {
+            p[i + (SSL3_RANDOM_SIZE - inner_sni_length)] = encrypted_sni[0];
+        } 
+    }
+
+    /* Add encrypted SNI to client random */
+    if (!WPACKET_put_bytes_u16(pkt, s->client_version)
+            || !WPACKET_memcpy(pkt, encrypted_sni, SSL3_RANDOM_SIZE)) {
+        SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);
+        return CON_FUNC_ERROR;
+    }
+#elif defined(OPENSSL_NO_ECH)
     if (!WPACKET_put_bytes_u16(pkt, s->client_version)
             || !WPACKET_memcpy(pkt, p, SSL3_RANDOM_SIZE)) {
         SSLfatal(s, SSL_AD_INTERNAL_ERROR, ERR_R_INTERNAL_ERROR);

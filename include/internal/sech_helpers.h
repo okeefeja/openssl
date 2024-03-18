@@ -21,5 +21,11 @@ char * unsafe_encrypt_aes128gcm(
     unsigned char * somekey,
     int key_len,
     int * out_len);
+char *unsafe_decrypt_aes128gcm(
+    unsigned char *ciphertext,
+    int ciphertext_len,
+    unsigned char *somekey,
+    int key_len,
+    int *out_len);
 #endif
 #endif
