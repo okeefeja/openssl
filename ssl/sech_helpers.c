@@ -55,7 +55,7 @@ char * unsafe_encrypt_aes128gcm(
      * Bogus key and IV: we'd normally set these from
      * another source.
      */
-    unsigned char * iv = NULL; // {0,0,0,0,0,0,0,0,0,0,0,0};// NULL; // TODO generate iv securely
+    unsigned char iv[EVP_MAX_IV_LENGTH] = {0};
     EVP_CIPHER_CTX *ctx = NULL;
     EVP_CIPHER * cipher = NULL;
 
@@ -63,6 +63,14 @@ char * unsafe_encrypt_aes128gcm(
     BIO_dump_fp(stderr, plain, plain_len);
     BIO_dump_fp(stderr, somekey, key_len);
 #endif//SECH_DEBUG
+
+
+
+    fprintf(stderr, "SECH: plaintext:\n");
+    BIO_dump_fp(stderr, plain, plain_len);
+
+
+
 
     ctx = EVP_CIPHER_CTX_new();
     /* Fetch the cipher implementation */
@@ -157,12 +165,12 @@ char *unsafe_decrypt_aes128gcm(
      * Bogus key and IV: we'd normally set these from
      * another source.
      */
-    unsigned char * iv = NULL; // {0,0,0,0,0,0,0,0,0,0,0,0};// NULL; // TODO generate iv securely
+    unsigned char iv[EVP_MAX_IV_LENGTH] = {0};
     EVP_CIPHER_CTX *ctx = NULL;
     EVP_CIPHER * cipher = NULL;
 
     unsigned char plaintext[1024];
-    int len, plaintext_len;
+    int len, tmp_len;
 
 #ifdef  SECH_DEBUG
     BIO_dump_fp(stderr, ciphertext, ciphertext_len);
@@ -196,7 +204,6 @@ char *unsafe_decrypt_aes128gcm(
         EVP_CIPHER_CTX_free(ctx);
         return 0;
     }
-    plaintext_len = len;
 
     int iv_length = EVP_CIPHER_CTX_get_iv_length(ctx);
     fprintf(stderr, "SECH: iv length: %i\n", iv_length);
@@ -207,27 +214,21 @@ char *unsafe_decrypt_aes128gcm(
     }
     BIO_dump_fp(stderr, updated_iv, iv_length);
 
-    if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) {
-        fprintf(stderr, "SECH: encountered error in EVP_DecryptFinal_ex\n");
-        EVP_CIPHER_CTX_free(ctx);
-        return NULL;
-    }
-    plaintext_len += len;
-    fprintf(stderr, "SECH: outlen: %i\n", plaintext_len);
+    fprintf(stderr, "SECH: outlen: %i\n", len);
     fprintf(stderr, "SECH: outbuf ptr: %p\n", (void*)plaintext);
     fprintf(stderr, "SECH: outbuf:\n");
-    BIO_dump_fp(stderr, plaintext, plaintext_len);
-    char* ret = (char*)malloc(plaintext_len + 1);
+    BIO_dump_fp(stderr, plaintext, len);
+    char* ret = (char*)malloc(len + 1);
     if (ret == NULL) {
         fprintf(stderr, "SECH: failed to allocate memory\n");
         EVP_CIPHER_CTX_free(ctx);
         return NULL;
     }
-    memcpy(ret, plaintext, plaintext_len);
+    memcpy(ret, plaintext, len);
     fprintf(stderr, "SECH: ret ptr: %p\n", (void*)ret);
-    BIO_dump_fp(stderr, ret, plaintext_len);
-    fprintf(stderr, "SECH: finished symmetric encryption\n");
-    *out_len = plaintext_len;
+    BIO_dump_fp(stderr, ret, len);
+    fprintf(stderr, "SECH: finished symmetric decryption\n");
+    *out_len = len;
     return ret;
 }
 #endif

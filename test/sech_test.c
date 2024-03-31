@@ -128,17 +128,17 @@ static int encrypt_symmetric_test(void) {
     int key_len = 8;
     int out_len = -1;
     char* cipher_text = unsafe_encrypt_aes128gcm(plain, plain_len, key, key_len, &out_len);
-    int decrypt_out_len = 0;
+
     char * decrypted_text = unsafe_decrypt_aes128gcm(
         (unsigned char *)cipher_text,
         out_len,
         key,
         key_len,
-        &decrypt_out_len);
+        &out_len);
     fprintf(stderr, "SECH: cipher_text ptr: %p\n", cipher_text);
-    fprintf(stderr, "SECH: decrypt_out_len ptr: %i\n", decrypt_out_len);
+    fprintf(stderr, "SECH: out_len ptr: %i\n", out_len);
     BIO_dump_fp(stderr, cipher_text, out_len); // TODO return length from unsafe_encrypt_aes256cbc
-    BIO_dump_fp(stderr, decrypted_text, decrypt_out_len); // TODO return length from unsafe_encrypt_aes256cbc
+    BIO_dump_fp(stderr, decrypted_text, out_len); // TODO return length from unsafe_encrypt_aes256cbc
     if(cipher_text != NULL && out_len != -1) {
         res = 1;
     }
