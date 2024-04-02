@@ -30,6 +30,8 @@ const char *propq = NULL;
 char * unsafe_encrypt_aes128gcm(
     unsigned char * plain,
     int plain_len,
+    // unsigned char * iv,
+    unsigned char iv[12],
     unsigned char * somekey,
     int key_len,
     int * out_len)
@@ -41,7 +43,7 @@ char * unsafe_encrypt_aes128gcm(
             BIO_printf(trc_out, "Debugging information\n");
         } OSSL_TRACE_END(TLS);
     }
-    BIO * trace_out = BIO_new_fp(stderr, NULL);
+    BIO * trace_out = BIO_new_fp(stderr, 0);
     OSSL_TRACE_BEGIN(TLS) {
         BIO_printf(trace_out, "SECH: test trace BIO_printf\n");
     } OSSL_TRACE_END(TLS);
@@ -55,7 +57,7 @@ char * unsafe_encrypt_aes128gcm(
      * Bogus key and IV: we'd normally set these from
      * another source.
      */
-    unsigned char iv[EVP_MAX_IV_LENGTH] = {0};
+    // unsigned char iv[EVP_MAX_IV_LENGTH] = {0};
     EVP_CIPHER_CTX *ctx = NULL;
     EVP_CIPHER * cipher = NULL;
 
@@ -139,10 +141,19 @@ char * unsafe_encrypt_aes128gcm(
 
 
 
+// char *unsafe_decrypt_aes128gcm(
+//     unsigned char *ciphertext,
+//     int ciphertext_len,
+//     unsigned char * iv,
+//     unsigned char *somekey,
+//     int key_len,
+//     int *out_len);
 
 char *unsafe_decrypt_aes128gcm(
     unsigned char *ciphertext,
     int ciphertext_len,
+    // unsigned char *iv,
+    unsigned char iv[12],
     unsigned char *somekey,
     int key_len,
     int *out_len)
@@ -153,7 +164,7 @@ char *unsafe_decrypt_aes128gcm(
             BIO_printf(trc_out, "Debugging information\n");
         } OSSL_TRACE_END(TLS);
     }
-    BIO * trace_out = BIO_new_fp(stderr, NULL);
+    BIO * trace_out = BIO_new_fp(stderr, 0);
     OSSL_TRACE_BEGIN(TLS) {
         BIO_printf(trace_out, "SECH: test trace BIO_printf\n");
     } OSSL_TRACE_END(TLS);
@@ -165,12 +176,11 @@ char *unsafe_decrypt_aes128gcm(
      * Bogus key and IV: we'd normally set these from
      * another source.
      */
-    unsigned char iv[EVP_MAX_IV_LENGTH] = {0};
     EVP_CIPHER_CTX *ctx = NULL;
     EVP_CIPHER * cipher = NULL;
 
     unsigned char plaintext[1024];
-    int len, tmp_len;
+    int len;
 
 #ifdef  SECH_DEBUG
     BIO_dump_fp(stderr, ciphertext, ciphertext_len);
@@ -212,6 +222,7 @@ char *unsafe_decrypt_aes128gcm(
     if(!EVP_CIPHER_CTX_get_updated_iv(ctx, updated_iv, iv_length)) {
         fprintf(stderr, "SECH: failed to get updated_iv\n");
     }
+    fprintf(stderr, "SECH: updated_iv\n");
     BIO_dump_fp(stderr, updated_iv, iv_length);
 
     fprintf(stderr, "SECH: outlen: %i\n", len);
