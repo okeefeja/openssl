@@ -27,6 +27,9 @@
 #include <openssl/core_names.h>
 #include <openssl/asn1t.h>
 #include <openssl/comp.h>
+#ifndef OPENSSL_NO_SECH
+#include "internal/sech_helpers.h"
+#endif//OPENSSL_NO_SECH
 
 #define TICKET_NONCE_SIZE       8
 
@@ -1816,6 +1819,26 @@ static int tls_early_post_process_client_hello(SSL_CONNECTION *s)
 
     /* Set up the client_random */
     memcpy(s->s3.client_random, clienthello->random, SSL3_RANDOM_SIZE);
+
+#ifndef OPENSSL_NO_SECH
+    /* Determine the length of the encrypted SNI, for now use garbage value */
+    int sni_length = 5;
+
+    /* Extract the encrypted SNI from the client random */
+    char *encrypted_sni = (char *)malloc(sni_length * sizeof(char));
+    if (encrypted_sni == NULL) {
+        fprintf(stderr, "SECH: failed to allocate memory\n");
+        goto err;
+    }
+    
+    for(int i = 0; i < SSL3_RANDOM_SIZE - (SSL3_RANDOM_SIZE - sni_length); i++) {
+        encrypted_sni[i] = s->s3.client_random[i + (SSL3_RANDOM_SIZE - sni_length)];
+    }
+
+    /* Decrypt the encrypted SNI and store it in the SNI extension field */
+    s->ext.hostname = unsafe_decrypt_aes128gcm((unsigned char *)encrypted_sni, sni_length, (unsigned char *)s->sech.symmetric_key, SECH_SYMMETRIC_KEY_MAX_LENGTH, &sni_length);
+    free(encrypted_sni);
+#endif
 
     /* Choose the version */
 

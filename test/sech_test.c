@@ -7,6 +7,7 @@
  * https://www.openssl.org/source/license.html
  */
 
+#include <openssl/evp.h>
 #include <openssl/ssl.h>
 #include <openssl/hpke.h>
 #include "../include/internal/sech_helpers.h"
@@ -127,9 +128,27 @@ static int encrypt_symmetric_test(void) {
     unsigned char key[] = {0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB};
     int key_len = 8;
     int out_len = -1;
-    char* cipher_text = unsafe_encrypt_aes128gcm(plain, plain_len, key, key_len, &out_len);
+    unsigned char iv[12] = { //[EVP_MAX_IV_LENGTH] = {
+        2, 2, 2, 2,
+        2, 2, 2, 2,
+        2, 2, 2, 2,
+    };
+    char* cipher_text = unsafe_encrypt_aes128gcm(plain, plain_len, &iv, key, key_len, &out_len);
+
+    fprintf(stderr, "SECH: EVP_MAX_IV_LENGTH: %lu\n", EVP_MAX_IV_LENGTH);
+    fprintf(stderr, "SECH: sizeof(iv):  %lu\n", sizeof(iv));
+    fprintf(stderr, "SECH: sizeof(&iv): %lu\n", sizeof(*(&iv)));
+    char * decrypted_text = unsafe_decrypt_aes128gcm(
+        (unsigned char *)cipher_text,
+        out_len,
+        &iv,
+        key,
+        key_len,
+        &out_len);
     fprintf(stderr, "SECH: cipher_text ptr: %p\n", cipher_text);
+    fprintf(stderr, "SECH: plain text out_len ptr: %i\n", out_len);
     BIO_dump_fp(stderr, cipher_text, out_len); // TODO return length from unsafe_encrypt_aes256cbc
+    BIO_dump_fp(stderr, decrypted_text, out_len); // TODO return length from unsafe_encrypt_aes256cbc
     if(cipher_text != NULL && out_len != -1) {
         res = 1;
     }
