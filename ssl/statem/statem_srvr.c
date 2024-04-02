@@ -1835,8 +1835,19 @@ static int tls_early_post_process_client_hello(SSL_CONNECTION *s)
         encrypted_sni[i] = s->s3.client_random[i + (SSL3_RANDOM_SIZE - sni_length)];
     }
 
+    unsigned char iv[12] = {
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+    };
     /* Decrypt the encrypted SNI and store it in the SNI extension field */
-    s->ext.hostname = unsafe_decrypt_aes128gcm((unsigned char *)encrypted_sni, sni_length, (unsigned char *)s->sech.symmetric_key, SECH_SYMMETRIC_KEY_MAX_LENGTH, &sni_length);
+    s->ext.hostname = unsafe_decrypt_aes128gcm(
+        (unsigned char *)encrypted_sni,
+        sni_length,
+        iv,
+        (unsigned char *)s->sech.symmetric_key,
+        SECH_SYMMETRIC_KEY_MAX_LENGTH,
+        &sni_length);
     free(encrypted_sni);
 #endif
 

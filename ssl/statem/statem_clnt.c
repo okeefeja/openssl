@@ -1520,8 +1520,20 @@ __owur CON_FUNC_RETURN tls_construct_client_hello(SSL_CONNECTION *s, WPACKET *pk
     /* Get the length of the Client Hello Inner SNI */
     int inner_sni_length = strlen(s->ext.hostname);
     
+    fprintf(stderr, "SECH: inner_sni (ext.hostname): %s\n", s->ext.hostname);
+    unsigned char iv[12] = {
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+    };
     /* Encrypt the Client Hello Inner SNI */
-    char * encrypted_sni = unsafe_encrypt_aes128gcm((unsigned char *)s->ext.hostname, inner_sni_length, (unsigned char *)s->sech.symmetric_key, SECH_SYMMETRIC_KEY_MAX_LENGTH, &inner_sni_length);
+    char * encrypted_sni = unsafe_encrypt_aes128gcm(
+        (unsigned char *)s->ext.hostname,
+        inner_sni_length,
+        iv,
+        (unsigned char *)s->sech.symmetric_key,
+        SECH_SYMMETRIC_KEY_MAX_LENGTH,
+        &inner_sni_length);
 
     /* Replace last characters of Client Random with encrypted SNI */
     if(inner_sni_length < SSL3_RANDOM_SIZE) {
