@@ -18,12 +18,14 @@
 char * unsafe_encrypt_aes128gcm(
     unsigned char * plain,
     int plain_len,
+    unsigned char iv[12],
     unsigned char * somekey,
     int key_len,
     int * out_len);
 char *unsafe_decrypt_aes128gcm(
     unsigned char *ciphertext,
     int ciphertext_len,
+    unsigned char iv[12],
     unsigned char *somekey,
     int key_len,
     int *out_len);
