@@ -66,14 +66,6 @@ char * unsafe_encrypt_aes128gcm(
     BIO_dump_fp(stderr, somekey, key_len);
 #endif//SECH_DEBUG
 
-
-
-    fprintf(stderr, "SECH: plaintext:\n");
-    BIO_dump_fp(stderr, plain, plain_len);
-
-
-
-
     ctx = EVP_CIPHER_CTX_new();
     /* Fetch the cipher implementation */
     if ((cipher = EVP_CIPHER_fetch(libctx, "AES-128-GCM", propq)) == NULL) {

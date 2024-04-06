@@ -27,6 +27,10 @@
 #include <openssl/core_names.h>
 #include <openssl/param_build.h>
 #include "internal/cryptlib.h"
+
+// #include <openssl/bio.h>
+// #include <openssl/err.h>
+
 #ifndef OPENSSL_NO_SECH
 #include "internal/sech_helpers.h"
 #endif//OPENSSL_NO_SECH
@@ -1521,6 +1525,13 @@ __owur CON_FUNC_RETURN tls_construct_client_hello(SSL_CONNECTION *s, WPACKET *pk
     int inner_sni_length = strlen(s->ext.hostname);
     
     fprintf(stderr, "SECH: inner_sni (ext.hostname): %s\n", s->ext.hostname);
+    BIO_dump_fp(stderr, s->ext.hostname, inner_sni_length);
+    fprintf(stderr, "SECH: inner_sni_length: %i\n", inner_sni_length);
+
+    fprintf(stderr, "SECH: symmetric key length: %i\n", s->sech.symmetric_key_len);
+    fprintf(stderr, "SECH: symmetric key: %s\n", s->sech.symmetric_key);
+    BIO_dump_fp(stderr, s->sech.symmetric_key, SECH_SYMMETRIC_KEY_MAX_LENGTH);
+
     unsigned char iv[12] = {
         0, 0, 0, 0,
         0, 0, 0, 0,
@@ -1530,17 +1541,25 @@ __owur CON_FUNC_RETURN tls_construct_client_hello(SSL_CONNECTION *s, WPACKET *pk
     char * encrypted_sni = unsafe_encrypt_aes128gcm(
         (unsigned char *)s->ext.hostname,
         inner_sni_length,
-        iv,
+        &iv,
         (unsigned char *)s->sech.symmetric_key,
         SECH_SYMMETRIC_KEY_MAX_LENGTH,
         &inner_sni_length);
 
-    /* Replace last characters of Client Random with encrypted SNI */
-    if(inner_sni_length < SSL3_RANDOM_SIZE) {
-        for(int i = 0; i < SSL3_RANDOM_SIZE - (SSL3_RANDOM_SIZE - inner_sni_length); i++) {
-            p[i + (SSL3_RANDOM_SIZE - inner_sni_length)] = encrypted_sni[0];
-        } 
+    fprintf(stderr, "SECH: encrypted inner_sni:\n");
+    BIO_dump_fp(stderr, encrypted_sni, inner_sni_length);
+    fprintf(stderr, "SECH: encrypted inner_sni_length: %i\n", inner_sni_length);
+
+    p[0] = (unsigned char) inner_sni_length;
+    for(int i = 0; i < inner_sni_length; i++) {
+        p[i + 1] =  encrypted_sni[i];
     }
+    for(int i = 20; i < SSL3_RANDOM_SIZE; i++) {
+        p[i] = iv[i - 20]; 
+    }
+
+    fprintf(stderr, "SECH: client_random:\n");
+    BIO_dump_fp(stderr, p, SSL3_RANDOM_SIZE);
 
     /* Add encrypted SNI to client random */
     if (!WPACKET_put_bytes_u16(pkt, s->client_version)

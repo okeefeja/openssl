@@ -978,6 +978,7 @@ SSL *ossl_ssl_connection_new_int(SSL_CTX *ctx, const SSL_METHOD *method)
     if (s->sech.symmetric_key == NULL)
             goto err;
     memcpy(s->sech.symmetric_key, ctx->sech.symmetric_key, SECH_SYMMETRIC_KEY_MAX_LENGTH);
+    s->sech.symmetric_key_len = ctx->sech.symmetric_key_len;
 #endif
     return ssl;
  cerr:
@@ -5196,6 +5197,7 @@ SSL *SSL_dup(SSL *s)
 #endif
 #ifndef OPENSSL_NO_SECH
     retsc->sech.symmetric_key = sc->sech.symmetric_key;
+    retsc->sech.symmetric_key_len = sc->sech.symmetric_key_len;
 #endif
     return ret;
 

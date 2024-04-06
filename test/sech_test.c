@@ -100,8 +100,8 @@ static int test_SSL_CTX_sech_symmetric_key(void)
     // SSL *clientssl = NULL, *serverssl = NULL;
 
     /* setup contexts, initially for tlsv1.3 */
-    char key[5];
-    strcpy(key, "abab");
+    char key[9];
+    strcpy(key, "abababab");
     SSL_CTX_sech_symmetric_key(cctx, (char *)(&key));
     if (!TEST_ptr(cctx = SSL_CTX_new_ex(libctx, NULL, TLS_server_method())))
         goto end;
@@ -123,15 +123,15 @@ static int encrypt_symmetric_test(void) {
     int res = 0;
     // encrypt_symmetric(NULL,NULL,NULL);
 
-    unsigned char plain[] = "fooooooooooooooooooooooooooooooooooooooooooooooo.example.com";
+    unsigned char plain[] = "foo.example.com";
     int plain_len = sizeof(plain) - 1;//  / sizeof(unsigned char);
     unsigned char key[] = {0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB, 0xAB};
     int key_len = 8;
     int out_len = -1;
     unsigned char iv[12] = { //[EVP_MAX_IV_LENGTH] = {
-        2, 2, 2, 2,
-        2, 2, 2, 2,
-        2, 2, 2, 2,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
     };
     char* cipher_text = unsafe_encrypt_aes128gcm(plain, plain_len, &iv, key, key_len, &out_len);
 
