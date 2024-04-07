@@ -1821,28 +1821,18 @@ static int tls_early_post_process_client_hello(SSL_CONNECTION *s)
     memcpy(s->s3.client_random, clienthello->random, SSL3_RANDOM_SIZE);
 
 #ifndef OPENSSL_NO_SECH
+    /* Extract the ESNI, its length, and the IV from the ClientRandom */
     int sni_length = (int) s->s3.client_random[0];
     unsigned char * encrypted_sni = (unsigned char *)malloc(sni_length * sizeof(unsigned char));
-    
-    unsigned char iv[12];
-    for(int i = 20; i < SSL3_RANDOM_SIZE; i++) {
-        iv[i - 20] = s->s3.client_random[i - 20]; 
-    }
-
-    fprintf(stderr, "SECH: symmetric key length: %i\n", s->sech.symmetric_key_len);
-    fprintf(stderr, "SECH: symmetric key: %s\n", s->sech.symmetric_key);
-    BIO_dump_fp(stderr, s->sech.symmetric_key, SECH_SYMMETRIC_KEY_MAX_LENGTH);
-
-    fprintf(stderr, "SECH: encrypted inner_sni_length: %i\n", sni_length);
-
     for(int i = 0; i < sni_length; i++) {
         encrypted_sni[i] = s->s3.client_random[i + 1];
     }
+    unsigned char iv[12];
+    for(int i = 20; i < SSL3_RANDOM_SIZE; i++) {
+        iv[i - 20] = s->s3.client_random[i]; 
+    }
 
-    fprintf(stderr, "SECH: encrypted sni:\n");
-    BIO_dump_fp(stderr, encrypted_sni, sni_length);
-
-    /* Decrypt the encrypted SNI and store it in the SNI extension field */
+    /* Decrypt the ESNI and store it in the SNI extension field */
     s->ext.hostname = unsafe_decrypt_aes128gcm(
         encrypted_sni,
         sni_length,
@@ -1855,6 +1845,7 @@ static int tls_early_post_process_client_hello(SSL_CONNECTION *s)
     BIO_dump_fp(stderr, s->ext.hostname, sni_length);
 
     free(encrypted_sni);
+    free(iv);
 #endif
 
     /* Choose the version */
